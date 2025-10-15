@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { Diary, DiaryCreate } from '@/types';
+import { Diary, DiaryCreate, PaginatedResponse } from '@/types';
 
 export interface DiariesQuery {
   skip?: number;
@@ -20,7 +20,7 @@ export interface DiaryStatistics {
 // Diaries API calls
 export const diariesApi = {
   // Get diary entries
-  getDiaries: async (params: DiariesQuery = {}): Promise<Diary[]> => {
+  getDiaries: async (params: DiariesQuery & { year?: number; month?: number } = {}): Promise<PaginatedResponse<Diary>> => {
     const response = await apiClient.get('/diaries', { params });
     return response.data;
   },
