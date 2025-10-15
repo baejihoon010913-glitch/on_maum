@@ -23,5 +23,5 @@ class Empathy(Base):
     )
     
     # Relationships
-    # user = relationship("User", back_populates="empathies")
-    # post = relationship("Post", back_populates="empathies")
+    user = relationship("User", back_populates="empathies")
+    post = relationship("Post", back_populates="empathies")

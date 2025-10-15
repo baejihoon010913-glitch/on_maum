@@ -24,5 +24,5 @@ class EmojiReaction(Base):
     )
     
     # Relationships
-    # user = relationship("User", back_populates="emoji_reactions")
-    # post = relationship("Post", back_populates="emoji_reactions")
+    user = relationship("User", back_populates="emoji_reactions")
+    post = relationship("Post", back_populates="emoji_reactions")

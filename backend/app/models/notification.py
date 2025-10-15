@@ -23,4 +23,4 @@ class Notification(Base):
     read_at = Column(DateTime(timezone=True), nullable=True)
     
     # Relationships
-    # user = relationship("User", back_populates="notifications")
+    user = relationship("User", back_populates="notifications")

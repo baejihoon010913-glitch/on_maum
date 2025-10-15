@@ -24,5 +24,7 @@ class Post(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    author = relationship("User", back_populates="posts")
+    user = relationship("User", back_populates="posts")
     reports = relationship("Report", back_populates="post")
+    empathies = relationship("Empathy", back_populates="post")
+    emoji_reactions = relationship("EmojiReaction", back_populates="post")

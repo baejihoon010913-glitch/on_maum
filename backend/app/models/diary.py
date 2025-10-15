@@ -21,4 +21,4 @@ class Diary(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    # user = relationship("User", back_populates="diaries")
+    user = relationship("User", back_populates="diaries")
