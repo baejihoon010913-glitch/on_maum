@@ -11,6 +11,7 @@ import { StaffProtectedRoute, StaffLayout } from '@/components/Staff';
 import {
   HomePage,
   LoginPage,
+  NaverCallbackPage,
   OnboardingPage,
   EmpathyNotesPage,
   CommaNotesPage,
@@ -58,6 +59,16 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute requireAuth={false}>
                 <LoginPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* OAuth Callback Route */}
+          <Route 
+            path="/auth/naver/callback" 
+            element={
+              <ProtectedRoute requireAuth={false}>
+                <NaverCallbackPage />
               </ProtectedRoute>
             } 
           />

@@ -3,8 +3,22 @@ import { Card, CardContent, CardHeader, Button } from '@/components/UI';
 
 const LoginPage: React.FC = () => {
   const handleNaverLogin = () => {
-    // TODO: Implement Naver OAuth login
-    console.log('Naver login clicked');
+    // Generate random state for security
+    const state = Math.random().toString(36).substring(2, 15);
+    sessionStorage.setItem('oauth_state', state);
+    
+    // Naver OAuth configuration
+    const naverClientId = import.meta.env.VITE_NAVER_CLIENT_ID || 'your_naver_client_id';
+    const redirectUri = encodeURIComponent(window.location.origin + '/auth/naver/callback');
+    const responseType = 'code';
+    
+    // Build Naver OAuth URL
+    const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=${responseType}&client_id=${naverClientId}&redirect_uri=${redirectUri}&state=${state}`;
+    
+    console.log('Redirecting to Naver OAuth:', naverAuthUrl);
+    
+    // Redirect to Naver OAuth
+    window.location.href = naverAuthUrl;
   };
 
   return (

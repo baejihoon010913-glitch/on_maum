@@ -1,6 +1,7 @@
 // Export all page components
 export { default as HomePage } from './HomePage';
 export { default as LoginPage } from './LoginPage';
+export { default as NaverCallbackPage } from './NaverCallbackPage';
 export { default as OnboardingPage } from './OnboardingPage';
 export { default as EmpathyNotesPage } from './EmpathyNotesPage';
 export { default as CommaNotesPage } from './CommaNotesPage';

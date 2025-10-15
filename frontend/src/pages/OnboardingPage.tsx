@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, Button, Input } from '@/components/UI';
 import { GENDER_OPTIONS, BIRTH_YEAR_RANGE } from '@/utils/constants';
+import { authApi } from '@/api/auth';
+import { useAuthStore } from '@/store';
 
 const OnboardingPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { setUser, setTokens } = useAuthStore();
+  
+  const [snsProfile, setSnsProfile] = useState<any>(null);
   const [formData, setFormData] = useState({
     nickname: '',
     birthYear: '',
@@ -10,6 +17,36 @@ const OnboardingPage: React.FC = () => {
   });
   const [nicknameChecking, setNicknameChecking] = useState(false);
   const [nicknameAvailable, setNicknameAvailable] = useState<boolean | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load SNS profile data on component mount
+  useEffect(() => {
+    const savedProfile = sessionStorage.getItem('sns_profile');
+    if (savedProfile) {
+      try {
+        const profile = JSON.parse(savedProfile);
+        setSnsProfile(profile);
+        
+        // Pre-fill nickname with SNS name if available
+        if (profile.name) {
+          setFormData(prev => ({
+            ...prev,
+            nickname: profile.name
+          }));
+        }
+      } catch (error) {
+        console.error('Error parsing SNS profile:', error);
+        setError('SNS 프로필 정보를 불러오는데 실패했습니다.');
+        // Redirect to login if no valid profile data
+        setTimeout(() => navigate('/login'), 2000);
+      }
+    } else {
+      setError('SNS 로그인 정보가 없습니다. 다시 로그인해주세요.');
+      // Redirect to login if no profile data
+      setTimeout(() => navigate('/login'), 2000);
+    }
+  }, [navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -25,20 +62,98 @@ const OnboardingPage: React.FC = () => {
   };
 
   const checkNickname = async () => {
-    if (!formData.nickname || formData.nickname.length < 2) return;
+    if (!formData.nickname || formData.nickname.length < 2) {
+      setError('닉네임은 2자 이상 입력해주세요.');
+      return;
+    }
     
     setNicknameChecking(true);
-    // TODO: Implement actual nickname check API call
-    setTimeout(() => {
-      setNicknameAvailable(true);
+    setError(null);
+    
+    try {
+      const result = await authApi.checkNickname(formData.nickname);
+      setNicknameAvailable(result.available);
+      
+      if (!result.available) {
+        setError(result.message || '이미 사용중인 닉네임입니다.');
+      }
+    } catch (error: any) {
+      console.error('Nickname check failed:', error);
+      setError('닉네임 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      setNicknameAvailable(false);
+    } finally {
       setNicknameChecking(false);
-    }, 1000);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement onboarding submission
-    console.log('Onboarding data:', formData);
+    
+    if (!snsProfile) {
+      setError('SNS 로그인 정보가 없습니다. 다시 로그인해주세요.');
+      return;
+    }
+
+    if (nicknameAvailable !== true) {
+      setError('닉네임 중복확인을 완료해주세요.');
+      return;
+    }
+
+    if (!formData.nickname || !formData.birthYear || !formData.gender) {
+      setError('모든 필수 정보를 입력해주세요.');
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const onboardingData = {
+        sns_provider: snsProfile.provider,
+        sns_id: snsProfile.sns_id,
+        email: snsProfile.email,
+        nickname: formData.nickname.trim(),
+        birth_year: parseInt(formData.birthYear),
+        gender: formData.gender,
+      };
+
+      console.log('Submitting onboarding data:', onboardingData);
+
+      const response = await authApi.completeOnboarding(onboardingData);
+      
+      // Save user data and tokens to store and localStorage
+      setUser(response.user);
+      setTokens(response.tokens);
+      
+      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('access_token', response.tokens.access_token);
+      localStorage.setItem('refresh_token', response.tokens.refresh_token);
+      
+      // Clean up session storage
+      sessionStorage.removeItem('sns_profile');
+      
+      console.log('Onboarding completed successfully:', response);
+      
+      // Redirect to home page
+      navigate('/', { replace: true });
+      
+    } catch (error: any) {
+      console.error('Onboarding failed:', error);
+      
+      let errorMessage = '회원가입 중 오류가 발생했습니다.';
+      
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || '입력된 정보가 올바르지 않습니다.';
+      } else if (error.response?.status === 409) {
+        errorMessage = '이미 가입된 사용자입니다.';
+      } else if (error.response?.status === 500) {
+        errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const birthYears = Array.from(
@@ -63,6 +178,40 @@ const OnboardingPage: React.FC = () => {
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                  <div className="flex">
+                    <div className="text-red-400">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-700">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SNS Profile Info */}
+              {snsProfile && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                  <div className="flex">
+                    <div className="text-green-400">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-green-700">
+                        네이버 계정({snsProfile.email})으로 로그인되었습니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Nickname */}
               <div>
                 <Input
@@ -85,7 +234,20 @@ const OnboardingPage: React.FC = () => {
                     중복확인
                   </Button>
                   {nicknameAvailable === true && (
-                    <span className="ml-2 text-sm text-green-600">사용 가능한 닉네임입니다</span>
+                    <span className="ml-2 text-sm text-green-600">
+                      <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      사용 가능한 닉네임입니다
+                    </span>
+                  )}
+                  {nicknameAvailable === false && (
+                    <span className="ml-2 text-sm text-red-600">
+                      <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                      사용할 수 없는 닉네임입니다
+                    </span>
                   )}
                 </div>
               </div>
@@ -136,9 +298,17 @@ const OnboardingPage: React.FC = () => {
                 type="submit"
                 className="w-full"
                 size="lg"
-                disabled={!formData.nickname || !formData.birthYear || !formData.gender || nicknameAvailable !== true}
+                disabled={!formData.nickname || !formData.birthYear || !formData.gender || nicknameAvailable !== true || submitting}
+                isLoading={submitting}
               >
-                가입 완료
+                {submitting ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    가입 처리 중...
+                  </div>
+                ) : (
+                  '가입 완료'
+                )}
               </Button>
 
               <div className="text-center text-xs text-gray-500">
