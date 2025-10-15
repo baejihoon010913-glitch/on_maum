@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // Layout
 import { MainLayout } from '@/components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { StaffProtectedRoute, StaffLayout } from '@/components/Staff';
 
 // Pages
 import {
@@ -21,8 +22,13 @@ import {
   ProfilePage,
 } from '@/pages';
 
+// Staff Pages
+import { StaffLoginPage, StaffDashboard } from '@/pages/Staff';
+import { UserManagementPage } from '@/pages/Admin';
+
 // Store
 import { initializeAuth } from '@/store';
+import { initializeStaffAuth } from '@/store/staffAuth';
 import { ROUTES } from '@/utils/constants';
 
 // Create a query client
@@ -39,6 +45,7 @@ const App: React.FC = () => {
   // Initialize auth state from localStorage
   useEffect(() => {
     initializeAuth();
+    initializeStaffAuth();
   }, []);
 
   return (
@@ -64,6 +71,16 @@ const App: React.FC = () => {
             } 
           />
 
+          {/* Staff Login (Public) */}
+          <Route 
+            path="/staff/login" 
+            element={
+              <StaffProtectedRoute requireAuth={false}>
+                <StaffLoginPage />
+              </StaffProtectedRoute>
+            } 
+          />
+
           {/* Protected routes (authentication required) */}
           <Route 
             path="/" 
@@ -82,6 +99,30 @@ const App: React.FC = () => {
             <Route path="counselors/:counselorId" element={<CounselorProfilePage />} />
             <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
             <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+          </Route>
+
+          {/* Staff Portal Routes (Protected) */}
+          <Route 
+            path="/staff" 
+            element={
+              <StaffProtectedRoute>
+                <StaffLayout />
+              </StaffProtectedRoute>
+            }
+          >
+            <Route path="dashboard" element={<StaffDashboard />} />
+          </Route>
+
+          {/* Admin Portal Routes (Admin Only) */}
+          <Route 
+            path="/admin" 
+            element={
+              <StaffProtectedRoute requiredRole="admin">
+                <StaffLayout />
+              </StaffProtectedRoute>
+            }
+          >
+            <Route path="users" element={<UserManagementPage />} />
           </Route>
 
           {/* 404 - Catch all route */}

@@ -15,3 +15,4 @@ from .report import Report
 from .time_slot import TimeSlot, CounselorSchedule, CounselorUnavailability
 from .counselor_profile import CounselorProfile
 from .counselor_review import CounselorReview
+from .audit_log import AuditLog

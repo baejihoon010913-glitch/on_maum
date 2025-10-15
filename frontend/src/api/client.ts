@@ -36,7 +36,25 @@ const tokenManager = {
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = tokenManager.getAccessToken();
+    // Check if this is a staff API request
+    const isStaffRequest = config.url?.includes('/staff') || config.url?.includes('/admin');
+    
+    let token = null;
+    if (isStaffRequest) {
+      // Use staff token for staff/admin endpoints
+      const staffAuth = localStorage.getItem('staff-auth-storage');
+      if (staffAuth) {
+        try {
+          const parsedAuth = JSON.parse(staffAuth);
+          token = parsedAuth.state?.tokens?.accessToken;
+        } catch (error) {
+          console.error('Failed to parse staff auth:', error);
+        }
+      }
+    } else {
+      // Use regular user token for user endpoints
+      token = tokenManager.getAccessToken();
+    }
     
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -119,19 +137,35 @@ apiClient.interceptors.response.use(
           
           return apiClient(originalRequest);
         } catch (refreshError) {
-          // Refresh failed, redirect to login
+          // Refresh failed, redirect to appropriate login
           processQueue(refreshError, null);
-          tokenManager.clearTokens();
-          window.location.href = '/login';
+          const isStaffRequest = originalRequest.url?.includes('/staff') || originalRequest.url?.includes('/admin');
+          
+          if (isStaffRequest) {
+            // Clear staff auth and redirect to staff login
+            localStorage.removeItem('staff-auth-storage');
+            window.location.href = '/staff/login';
+          } else {
+            // Clear user auth and redirect to user login
+            tokenManager.clearTokens();
+            window.location.href = '/login';
+          }
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
         }
       } else {
-        // No refresh token, redirect to login
+        // No refresh token, redirect to appropriate login
         isRefreshing = false;
-        tokenManager.clearTokens();
-        window.location.href = '/login';
+        const isStaffRequest = originalRequest.url?.includes('/staff') || originalRequest.url?.includes('/admin');
+        
+        if (isStaffRequest) {
+          localStorage.removeItem('staff-auth-storage');
+          window.location.href = '/staff/login';
+        } else {
+          tokenManager.clearTokens();
+          window.location.href = '/login';
+        }
       }
     }
 
