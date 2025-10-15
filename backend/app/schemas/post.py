@@ -38,3 +38,9 @@ class Post(PostInDB):
     is_empathized: bool = False
     emoji_reactions: list = []
     author: dict = {}
+
+
+class PostEmpathyResponse(BaseModel):
+    empathized: bool
+    empathy_count: int
+    message: str

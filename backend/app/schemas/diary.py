@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, Any
 from datetime import datetime
 import uuid
 
@@ -32,3 +32,13 @@ class DiaryInDB(DiaryBase):
 
 class Diary(DiaryInDB):
     pass
+
+
+class DiaryStatistics(BaseModel):
+    year: int
+    month: int
+    total_entries: int
+    mood_distribution: Dict[str, int]
+    most_active_day: Optional[int] = None
+    writing_streak: int
+    average_length: float
