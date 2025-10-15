@@ -41,7 +41,7 @@ class CounselorProfile(Base):
     # Session preferences
     session_types = Column(JSON, nullable=True)  # Array of session types (individual, group, etc.)
     
-    # Metadata
+    # details
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     

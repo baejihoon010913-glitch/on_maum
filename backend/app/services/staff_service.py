@@ -138,7 +138,7 @@ class StaffService:
             target_type="staff",
             target_id=str(db_staff.id),
             target_name=staff_data.name,
-            metadata={
+            details={
                 "role": staff_data.role.value,
                 "department": staff_data.department,
             }
@@ -188,7 +188,7 @@ class StaffService:
             target_type="staff",
             target_id=str(staff.id),
             target_name=staff.name,
-            metadata={
+            details={
                 "original": original_values,
                 "updated": update_data,
             }
@@ -227,7 +227,7 @@ class StaffService:
             target_type="staff",
             target_id=str(staff.id),
             target_name=staff.name,
-            metadata={
+            details={
                 "original_role": original_role,
                 "new_role": role_data.role.value,
             }
@@ -324,7 +324,7 @@ class AuditLogService:
         target_type: str = None,
         target_id: str = None,
         target_name: str = None,
-        metadata: Dict[str, Any] = None,
+        details: Dict[str, Any] = None,
         ip_address: str = None,
         user_agent: str = None,
         request_id: str = None,
@@ -344,7 +344,7 @@ class AuditLogService:
             target_type=target_type,
             target_id=target_id,
             target_name=target_name,
-            metadata=metadata,
+            details=details,
             ip_address=ip_address,
             user_agent=user_agent,
             request_id=request_id,

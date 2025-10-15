@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from app.core.database import get_db
+from app.db.session import get_db
 from app.core.rbac import (
     get_staff_from_token, require_role, require_permission,
     StaffRole, Permission, audit_log
@@ -22,7 +22,7 @@ from app.services.staff_service import StaffService, AuditLogService, DashboardS
 from app.services.counselor_service import CounselorService
 from app.schemas.counselor import (
     CounselorProfileCreate, CounselorProfileResponse,
-    CounselorScheduleCreate, CounselorUnavailableCreate
+    CounselorScheduleCreate, CounselorUnavailabilityCreate
 )
 
 router = APIRouter(prefix="/staff", tags=["staff"])
@@ -322,7 +322,7 @@ async def handle_session_action(
 
 
 @router.post("/counselor/replies")
-@audit_log(AuditAction.POST_WRITE, target_type="counselor_reply", severity=AuditSeverity.LOW)
+@audit_log(AuditAction.STAFF_POST_REPLY, target_type="counselor_reply", severity=AuditSeverity.LOW)
 async def create_counselor_reply(
     reply_data: Dict[str, str],
     current_staff: Staff = Depends(require_role(StaffRole.COUNSELOR)),
@@ -407,7 +407,7 @@ async def create_recurring_schedule(
 @router.post("/counselor/schedules/unavailable")
 @audit_log(AuditAction.STAFF_UPDATE, target_type="counselor_unavailable", severity=AuditSeverity.MEDIUM)
 async def set_unavailable_time(
-    unavailable_data: CounselorUnavailableCreate,
+    unavailable_data: CounselorUnavailabilityCreate,
     current_staff: Staff = Depends(require_role(StaffRole.COUNSELOR)),
     db: Session = Depends(get_db),
 ):

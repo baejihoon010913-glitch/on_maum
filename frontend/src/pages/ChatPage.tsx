@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, Button, Input } from '@/components/UI';
 import { chatApi } from '@/api';
 import { ChatSession, Message } from '@/types';
 import { useWebSocket, WebSocketMessage } from '@/utils/useWebSocket';
-import { authStore } from '@/store';
+import { useAuthStore } from '@/store';
 
 const ChatPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
-  
+
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -18,12 +18,12 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Auto-scroll refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
-  
+
   // Current user from auth store
   const currentUser = authStore.getState().user;
 
@@ -89,7 +89,7 @@ const ChatPage: React.FC = () => {
 
   function handleWebSocketMessage(message: WebSocketMessage) {
     console.log('Received WebSocket message:', message);
-    
+
     switch (message.type) {
       case 'message':
         // Add new message to the list
@@ -101,7 +101,7 @@ const ChatPage: React.FC = () => {
           return [...prev, message.data];
         });
         break;
-        
+
       case 'session_started':
         // Update session status
         if (currentSession) {
@@ -112,7 +112,7 @@ const ChatPage: React.FC = () => {
           });
         }
         break;
-        
+
       case 'session_ended':
         // Update session status
         if (currentSession) {
@@ -123,7 +123,7 @@ const ChatPage: React.FC = () => {
           });
         }
         break;
-        
+
       case 'error':
         console.error('WebSocket error message:', message.data);
         setError(message.data.message || '채팅 중 오류가 발생했습니다.');
@@ -159,7 +159,7 @@ const ChatPage: React.FC = () => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newMessage.trim() || !currentSession || sendingMessage) {
       return;
     }
@@ -335,11 +335,10 @@ const ChatPage: React.FC = () => {
                         setCurrentSession(session);
                         navigate(`/chat?session=${session.id}`);
                       }}
-                      className={`w-full text-left p-4 hover:bg-gray-50 transition-colors border-l-4 ${
-                        currentSession?.id === session.id
+                      className={`w-full text-left p-4 hover:bg-gray-50 transition-colors border-l-4 ${currentSession?.id === session.id
                           ? 'border-primary-500 bg-primary-50'
                           : 'border-transparent'
-                      }`}
+                        }`}
                     >
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
@@ -409,17 +408,15 @@ const ChatPage: React.FC = () => {
                             className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                           >
                             <div
-                              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                                isCurrentUser
+                              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${isCurrentUser
                                   ? 'bg-primary-600 text-white'
                                   : 'bg-gray-100 text-gray-900'
-                              }`}
+                                }`}
                             >
                               <p className="whitespace-pre-wrap">{message.content}</p>
                               <p
-                                className={`text-xs mt-1 ${
-                                  isCurrentUser ? 'text-primary-100' : 'text-gray-500'
-                                }`}
+                                className={`text-xs mt-1 ${isCurrentUser ? 'text-primary-100' : 'text-gray-500'
+                                  }`}
                               >
                                 {formatMessageTime(message.created_at)}
                               </p>
@@ -457,15 +454,15 @@ const ChatPage: React.FC = () => {
                       <Button
                         type="submit"
                         disabled={
-                          !newMessage.trim() || 
-                          sendingMessage || 
+                          !newMessage.trim() ||
+                          sendingMessage ||
                           (currentSession.status !== 'active' && currentSession.status !== 'pending')
                         }
                       >
                         {sendingMessage ? '전송 중...' : '전송'}
                       </Button>
                     </form>
-                    
+
                     {(currentSession.status === 'completed' || currentSession.status === 'cancelled') && (
                       <p className="text-xs text-gray-500 mt-2 text-center">
                         이 상담 세션은 종료되었습니다.

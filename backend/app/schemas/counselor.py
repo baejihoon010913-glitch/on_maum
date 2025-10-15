@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Any
 from datetime import date, time, datetime
 import uuid
 
-
+# --- Staff 관련 스키마 ---
 class StaffBase(BaseModel):
     id: uuid.UUID
     name: str
@@ -15,10 +15,10 @@ class StaffBase(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-
-class CounselorProfileBase(BaseModel):
+# --- CounselorProfile 관련 스키마 ---
+class CounselorProfile(BaseModel):
     id: uuid.UUID
     staff_id: uuid.UUID
     specialties: List[str]
@@ -37,24 +37,23 @@ class CounselorProfileBase(BaseModel):
     updated_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
+class CounselorProfileCreate(BaseModel):
+    specialties: List[str]
+    license_number: str
+    experience_years: int
+    education: str
+    introduction: str
+    working_hours: Optional[str] = None
 
+# --- Counselor 관련 스키마 ---
 class Counselor(BaseModel):
     staff: StaffBase
-    counselor_profile: CounselorProfileBase
+    counselor_profile: CounselorProfile
 
     class Config:
-        orm_mode = True
-
-    @classmethod
-    def from_orm(cls, obj):
-        """Custom from_orm to handle the nested structure"""
-        return cls(
-            staff=StaffBase.from_orm(obj),
-            counselor_profile=CounselorProfileBase.from_orm(obj.counselor_profile)
-        )
-
+        from_attributes = True
 
 class CounselorsList(BaseModel):
     items: List[Counselor]
@@ -62,7 +61,17 @@ class CounselorsList(BaseModel):
     skip: int
     limit: int
 
+# --- [추가] 아래 클래스가 누락되었습니다 ---
+# API 응답을 위한 스키마입니다. staff 정보와 counselor_profile 정보를 포함합니다.
+class CounselorProfileResponse(BaseModel):
+    staff: StaffBase
+    counselor_profile: CounselorProfile
 
+    class Config:
+        from_attributes = True
+
+
+# --- TimeSlot (상담 시간) 관련 스키마 ---
 class TimeSlotBase(BaseModel):
     id: uuid.UUID
     counselor_id: uuid.UUID
@@ -74,12 +83,10 @@ class TimeSlotBase(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
-
+        from_attributes = True
 
 class TimeSlot(TimeSlotBase):
     pass
-
 
 class TimeSlotCreate(BaseModel):
     date: date
@@ -87,11 +94,9 @@ class TimeSlotCreate(BaseModel):
     end_time: time
     is_available: bool = True
 
-
 class TimeRange(BaseModel):
-    start_time: str  # HH:MM format
-    end_time: str    # HH:MM format
-
+    start_time: str
+    end_time: str
 
 class TimeSlotBulkCreate(BaseModel):
     start_date: date
@@ -99,13 +104,12 @@ class TimeSlotBulkCreate(BaseModel):
     time_ranges: List[TimeRange]
     exclude_dates: Optional[List[date]] = None
 
-
 class CounselorAvailableSlots(BaseModel):
     counselor_id: str
     date: date
     available_slots: List[TimeSlot]
 
-
+# --- CounselorSchedule (상담사 스케줄) 관련 스키마 ---
 class CounselorScheduleBase(BaseModel):
     id: uuid.UUID
     counselor_id: uuid.UUID
@@ -122,17 +126,15 @@ class CounselorScheduleBase(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
-
+        from_attributes = True
 
 class CounselorSchedule(CounselorScheduleBase):
     pass
 
-
 class CounselorScheduleCreate(BaseModel):
     name: str
     description: Optional[str] = None
-    days_of_week: List[int]  # 0=Monday, 6=Sunday
+    days_of_week: List[int]
     start_time: time
     end_time: time
     session_duration_minutes: int = 50
@@ -140,7 +142,7 @@ class CounselorScheduleCreate(BaseModel):
     effective_from: date
     effective_until: Optional[date] = None
 
-
+# --- CounselorUnavailability (상담 불가 시간) 관련 스키마 ---
 class CounselorUnavailabilityBase(BaseModel):
     id: uuid.UUID
     counselor_id: uuid.UUID
@@ -153,12 +155,10 @@ class CounselorUnavailabilityBase(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
-
+        from_attributes = True
 
 class CounselorUnavailability(CounselorUnavailabilityBase):
     pass
-
 
 class CounselorUnavailabilityCreate(BaseModel):
     start_date: date
@@ -168,33 +168,25 @@ class CounselorUnavailabilityCreate(BaseModel):
     reason: str
     notes: Optional[str] = None
 
-
-class CounselorReviewBase(BaseModel):
-    id: uuid.UUID
-    counselor_profile_id: uuid.UUID
-    user_id: uuid.UUID
-    session_id: uuid.UUID
-    rating: int
-    review_text: Optional[str] = None
-    communication_rating: Optional[int] = None
-    helpfulness_rating: Optional[int] = None
-    professionalism_rating: Optional[int] = None
-    is_approved: bool
-    is_anonymous: bool
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
-
-
-class CounselorReview(CounselorReviewBase):
-    pass
-
-
-class CounselorReviewCreate(BaseModel):
+# --- CounselorReview (상담사 리뷰) 관련 스키마 ---
+class CounselorReviewFields(BaseModel):
     rating: int
     review_text: Optional[str] = None
     communication_rating: Optional[int] = None
     helpfulness_rating: Optional[int] = None
     professionalism_rating: Optional[int] = None
     is_anonymous: bool = False
+
+class CounselorReviewCreate(CounselorReviewFields):
+    pass
+
+class CounselorReview(CounselorReviewFields):
+    id: uuid.UUID
+    counselor_profile_id: uuid.UUID
+    user_id: uuid.UUID
+    session_id: uuid.UUID
+    is_approved: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 import enum
 
-from app.core.security import ALGORITHM, SECRET_KEY
-from app.core.database import get_db
+from app.core.config import settings
+from app.db.session import get_db
 from app.models.staff import Staff
 from app.models.audit_log import AuditLog, AuditAction, AuditSeverity
 

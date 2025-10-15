@@ -130,7 +130,7 @@ class AuditLogResponse(BaseModel):
     target_type: Optional[str]
     target_id: Optional[str]
     target_name: Optional[str]
-    metadata: Optional[Dict[str, Any]]
+    details: Optional[Dict[str, Any]]
     ip_address: Optional[str]
     user_agent: Optional[str]
     request_id: Optional[str]

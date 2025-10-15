@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { authStore } from '@/store';
+import { useAuthStore } from '@/store';
 
 export interface WebSocketMessage {
   type: 'message' | 'user_joined' | 'user_left' | 'session_started' | 'session_ended' | 'error';
@@ -43,13 +43,13 @@ export const useWebSocket = (options: UseWebSocketOptions): UseWebSocketReturn =
 
   const getWebSocketUrl = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = process.env.NODE_ENV === 'development' 
-      ? 'localhost:8000' 
+    const host = process.env.NODE_ENV === 'development'
+      ? 'localhost:8000'
       : window.location.host;
-    
+
     const tokens = authStore.getState().tokens;
     const accessToken = tokens?.access_token;
-    
+
     if (!accessToken) {
       throw new Error('No access token available');
     }
@@ -93,7 +93,7 @@ export const useWebSocket = (options: UseWebSocketOptions): UseWebSocketReturn =
         if (!isManualDisconnectRef.current && reconnectCountRef.current < reconnectAttempts) {
           setConnectionStatus('reconnecting');
           reconnectCountRef.current += 1;
-          
+
           reconnectTimeoutRef.current = setTimeout(() => {
             console.log(`Reconnecting attempt ${reconnectCountRef.current}/${reconnectAttempts}`);
             connect();
@@ -116,7 +116,7 @@ export const useWebSocket = (options: UseWebSocketOptions): UseWebSocketReturn =
 
   const disconnect = useCallback(() => {
     isManualDisconnectRef.current = true;
-    
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
@@ -137,7 +137,7 @@ export const useWebSocket = (options: UseWebSocketOptions): UseWebSocketReturn =
         content,
         timestamp: new Date().toISOString(),
       };
-      
+
       wsRef.current.send(JSON.stringify(message));
     } else {
       console.error('WebSocket is not connected');

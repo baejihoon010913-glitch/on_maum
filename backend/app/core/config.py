@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import Optional
 
 
@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     NAVER_CLIENT_SECRET: Optional[str] = None
     NAVER_REDIRECT_URI: Optional[str] = None
 
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7일
+    
     class Config:
         env_file = ".env"
 

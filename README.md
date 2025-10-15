@@ -85,8 +85,8 @@ cp .env.example .env
 # Docker로 PostgreSQL 실행
 docker run -d --name onmaum-db \
   -e POSTGRES_DB=onmaum_db \
-  -e POSTGRES_USER=onmaum_user \
-  -e POSTGRES_PASSWORD=onmaum_password \
+  -e POSTGRES_USER=onmaum_admin \
+  -e POSTGRES_PASSWORD=admin \
   -p 5432:5432 \
   postgres:15
 ```

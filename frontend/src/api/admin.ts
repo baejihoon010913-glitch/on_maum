@@ -88,7 +88,7 @@ export interface AuditLogEntry {
   target_type?: string;
   target_id?: string;
   target_name?: string;
-  metadata?: Record<string, any>;
+  details?: Record<string, any>;
   ip_address?: string;
   user_agent?: string;
   request_id?: string;

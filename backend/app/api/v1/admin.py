@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, and_, or_, desc
 from datetime import datetime, timedelta
 
-from app.core.database import get_db
+from app.db.session import get_db
 from app.core.rbac import (
     get_staff_from_token, require_role, require_permission,
     StaffRole, Permission, audit_log

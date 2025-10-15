@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-from app.db.base_class import Base
+from app.db.session import Base
 
 
 class TimeSlot(Base):
@@ -67,7 +67,7 @@ class CounselorSchedule(Base):
     # Status
     is_active = Column(Boolean, default=True, nullable=False)
     
-    # Metadata
+    # details
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=True)
     created_by = Column(UUID(as_uuid=True), ForeignKey("staff.id"), nullable=False)
@@ -100,7 +100,7 @@ class CounselorUnavailability(Base):
     reason = Column(String(50), nullable=False)  # vacation, sick_leave, training, personal, etc.
     notes = Column(String(500), nullable=True)
     
-    # Metadata
+    # details
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=True)
     created_by = Column(UUID(as_uuid=True), ForeignKey("staff.id"), nullable=False)

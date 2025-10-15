@@ -258,20 +258,21 @@ class CounselorService:
 
         return time_slot
 
-    def create_counselor_schedule(
+def create_counselor_schedule(
         self,
         counselor_id: str,
         name: str,
-        days_of_week: List[int],  # 0=Monday, 6=Sunday
+        days_of_week: List[int],
         start_time: time,
         end_time: time,
-        session_duration_minutes: int = 50,
+        effective_from: date,              # <- 위치 이동
+        session_duration_minutes: int = 50, 
         break_duration_minutes: int = 10,
-        effective_from: date,
         effective_until: Optional[date] = None,
         created_by: str = None,
         description: Optional[str] = None
     ) -> CounselorSchedule:
+
         """
         Create a recurring schedule rule for a counselor.
         """
@@ -296,7 +297,7 @@ class CounselorService:
 
         return schedule
 
-    def generate_slots_from_schedule(
+def generate_slots_from_schedule(
         self,
         schedule: CounselorSchedule,
         target_date: date

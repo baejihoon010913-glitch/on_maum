@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from './Button';
+import Button from './Button';
 
 interface CalendarProps {
   selectedDate?: Date;
@@ -139,16 +139,15 @@ export const Calendar: React.FC<CalendarProps> = ({
               disabled={disabled || !isCurrentMonth}
               className={`
                 h-10 text-sm rounded-md transition-colors duration-200
-                ${
-                  !isCurrentMonth
-                    ? 'text-gray-300 cursor-not-allowed'
-                    : disabled
+                ${!isCurrentMonth
+                  ? 'text-gray-300 cursor-not-allowed'
+                  : disabled
                     ? 'text-gray-400 cursor-not-allowed'
                     : selected
-                    ? 'bg-primary-600 text-white font-semibold'
-                    : todayDate
-                    ? 'bg-primary-100 text-primary-600 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-primary-600 text-white font-semibold'
+                      : todayDate
+                        ? 'bg-primary-100 text-primary-600 font-semibold'
+                        : 'text-gray-700 hover:bg-gray-100'
                 }
               `}
             >

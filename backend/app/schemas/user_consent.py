@@ -21,7 +21,7 @@ class UserConsentResponse(UserConsentBase):
     can_revoke: bool = True
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserConsentHistory(BaseModel):
@@ -34,7 +34,7 @@ class UserConsentHistory(BaseModel):
     access_count: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserConsentsResponse(BaseModel):

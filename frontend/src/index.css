@@ -3,57 +3,77 @@
 @tailwind utilities;
 
 @layer base {
+
+  /* :root는 라이트 모드 기본 색상입니다. */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --border: 214.3 31.8% 91.4%;
+    /* ... 기타 필요한 shadcn/ui 변수들 ... */
+  }
+
+  /* .dark는 다크 모드 색상입니다. */
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    /* ... 기타 필요한 shadcn/ui 변수들 ... */
+  }
+
+  /* --- 기존에 작성하셨던 코드는 이 안에 위치합니다 --- */
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
 }
 
+
 @layer components {
+
   /* Mobile-first button styles */
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
+
   .btn-primary {
     @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500;
   }
-  
+
   .btn-secondary {
     @apply btn bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-500;
   }
-  
+
   .btn-outline {
     @apply btn border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500;
   }
-  
+
   /* Mobile-first card styles */
   .card {
     @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6;
   }
-  
+
   /* Mobile-first input styles */
   .form-input {
     @apply w-full px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors;
   }
-  
+
   /* Mobile navigation */
   .mobile-nav {
     @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden;
   }
-  
+
   .mobile-nav-item {
     @apply flex flex-col items-center justify-center py-2 px-3 text-xs text-gray-600 hover:text-primary-500 transition-colors;
   }
-  
+
   .mobile-nav-item.active {
     @apply text-primary-500;
   }
@@ -63,36 +83,36 @@
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
-  
+
   .safe-area-top {
     padding-top: env(safe-area-inset-top);
   }
-  
+
   /* Responsive text sizes - mobile first */
   .text-responsive-xs {
     @apply text-xs sm:text-sm;
   }
-  
+
   .text-responsive-sm {
     @apply text-sm sm:text-base;
   }
-  
+
   .text-responsive-base {
     @apply text-base sm:text-lg;
   }
-  
+
   .text-responsive-lg {
     @apply text-lg sm:text-xl;
   }
-  
+
   .text-responsive-xl {
     @apply text-xl sm:text-2xl;
   }
-  
+
   .text-responsive-2xl {
     @apply text-2xl sm:text-3xl;
   }
-  
+
   /* Line clamp utilities */
   .line-clamp-1 {
     display: -webkit-box;
@@ -100,14 +120,14 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;

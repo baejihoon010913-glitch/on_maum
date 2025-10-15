@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Text, DateTime, Enum, JSON, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from app.core.database import Base
+from app.db.session import Base
 import uuid
 import enum
 from datetime import datetime
@@ -21,6 +21,7 @@ class AuditAction(enum.Enum):
     STAFF_UPDATE = "staff_update"
     STAFF_DELETE = "staff_delete"
     STAFF_ROLE_CHANGE = "staff_role_change"
+    STAFF_POST_REPLY = "staff_post_reply"
     
     # Post Management
     POST_DELETE = "post_delete"
@@ -83,7 +84,7 @@ class AuditLog(Base):
     target_name = Column(String(200), nullable=True) # Name/title of affected entity
     
     # Additional context data
-    metadata = Column(JSON, nullable=True)  # Store additional context as JSON
+    details = Column(JSON, nullable=True)  # Store additional context as JSON
     
     # Request information
     ip_address = Column(String(45), nullable=True)  # IPv6 support
@@ -116,7 +117,7 @@ class AuditLog(Base):
             "target_type": self.target_type,
             "target_id": self.target_id,
             "target_name": self.target_name,
-            "metadata": self.metadata,
+            "details": self.details,
             "ip_address": self.ip_address,
             "user_agent": self.user_agent,
             "request_id": self.request_id,
@@ -137,7 +138,7 @@ class AuditLog(Base):
         target_type: str = None,
         target_id: str = None,
         target_name: str = None,
-        metadata: dict = None,
+        details: dict = None,
         ip_address: str = None,
         user_agent: str = None,
         request_id: str = None,
@@ -157,7 +158,7 @@ class AuditLog(Base):
             target_type=target_type,
             target_id=target_id,
             target_name=target_name,
-            metadata=metadata,
+            details=details,
             ip_address=ip_address,
             user_agent=user_agent,
             request_id=request_id,
