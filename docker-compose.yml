@@ -6,8 +6,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: onmaum_db
-      POSTGRES_USER: onmaum_user
-      POSTGRES_PASSWORD: onmaum_password
+      POSTGRES_USER: onmaum_admin
+      POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
     volumes:
@@ -21,7 +21,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://onmaum_user:onmaum_password@db:5432/onmaum_db
+      DATABASE_URL: postgresql://onmaum_admin:admin@db:5432/onmaum_db
       SECRET_KEY: your-secret-key-here-change-in-production
       JWT_SECRET_KEY: your-jwt-secret-key-here-change-in-production
     depends_on:
