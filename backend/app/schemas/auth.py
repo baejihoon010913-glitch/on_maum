@@ -41,3 +41,25 @@ class LoginResponse(BaseModel):
     user: Optional[dict] = None
     tokens: Optional[Token] = None
     sns_profile: Optional[SNSProfile] = None
+
+
+class AuthTokens(BaseModel):
+    access_token: str
+    refresh_token: str  
+    token_type: str = "bearer"
+    expires_in: int
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
+class AccountDeletionRequest(BaseModel):
+    confirmation_text: str
+    reason: Optional[str] = None
+
+
+class AccountDeletionResponse(BaseModel):
+    message: str
+    deleted_at: str
+    data_retention_info: dict

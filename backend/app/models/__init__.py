@@ -7,3 +7,5 @@ from .message import Message
 from .counselor import Counselor, CounselorProfile
 from .notification import Notification
 from .staff import Staff
+from .user_consent import UserConsent
+from .refresh_token import RefreshToken
