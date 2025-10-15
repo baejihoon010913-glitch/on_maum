@@ -134,6 +134,18 @@ export interface Counselor {
   };
 }
 
+// Time Slot types
+export interface TimeSlot {
+  id: string;
+  counselor_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  is_available: boolean;
+  is_booked: boolean;
+  created_at: string;
+}
+
 // Notification types
 export interface Notification {
   id: string;

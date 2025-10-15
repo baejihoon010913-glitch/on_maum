@@ -16,6 +16,7 @@ import {
   ChatPage,
   DiaryPage,
   CounselorsPage,
+  CounselorProfilePage,
   NotificationsPage,
   ProfilePage,
 } from '@/pages';
@@ -78,6 +79,7 @@ const App: React.FC = () => {
             <Route path={ROUTES.CHAT} element={<ChatPage />} />
             <Route path={ROUTES.DIARY} element={<DiaryPage />} />
             <Route path={ROUTES.COUNSELORS} element={<CounselorsPage />} />
+            <Route path="counselors/:counselorId" element={<CounselorProfilePage />} />
             <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
             <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
           </Route>
