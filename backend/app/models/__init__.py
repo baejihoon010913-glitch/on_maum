@@ -7,7 +7,5 @@ from .message import Message
 from .counselor import Counselor, CounselorProfile
 from .notification import Notification
 from .staff import Staff
-from .empathy import Empathy
-from .emoji_reaction import EmojiReaction
-from .counselor_reply import CounselorReply
-from .report import Report
+from .user_consent import UserConsent
+from .refresh_token import RefreshToken

@@ -5,4 +5,5 @@ from .chat_session import ChatSession, ChatSessionCreate, ChatSessionUpdate
 from .message import Message, MessageCreate
 from .counselor import Counselor, CounselorProfile
 from .notification import Notification, NotificationCreate
-from .auth import Token, TokenData, SNSLoginRequest, OnboardingRequest
+from .auth import Token, TokenData, SNSLoginRequest, OnboardingRequest, AuthTokens, RefreshTokenRequest, AccountDeletionRequest
+from .user_consent import UserConsentCreate, UserConsentResponse, UserConsentsResponse
