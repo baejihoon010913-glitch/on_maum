@@ -12,12 +12,26 @@ const NaverCallbackPage: React.FC = () => {
   const [message, setMessage] = useState('네이버 로그인을 처리하고 있습니다...');
 
   useEffect(() => {
+    // Prevent duplicate execution in React Strict Mode
+    const isProcessed = sessionStorage.getItem('oauth_processing');
+    
     const handleNaverCallback = async () => {
       try {
         const code = searchParams.get('code');
         const state = searchParams.get('state');
         const error = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
+
+        console.log('NaverCallback - Processing:', { code: code?.substring(0, 10), state: state?.substring(0, 10), isProcessed });
+
+        // Prevent duplicate processing
+        if (isProcessed) {
+          console.log('OAuth callback already processed, skipping...');
+          return;
+        }
+
+        // Mark as processing
+        sessionStorage.setItem('oauth_processing', 'true');
 
         // Check for OAuth errors
         if (error) {
@@ -30,6 +44,8 @@ const NaverCallbackPage: React.FC = () => {
 
         // Verify state parameter for security
         const savedState = sessionStorage.getItem('oauth_state');
+        console.log('State verification:', { receivedState: state, savedState, match: state === savedState });
+        
         if (state !== savedState) {
           throw new Error('잘못된 상태 파라미터입니다. 보안상 로그인을 중단합니다.');
         }
@@ -46,6 +62,8 @@ const NaverCallbackPage: React.FC = () => {
           // New user - redirect to onboarding with SNS profile data
           if (response.sns_profile) {
             sessionStorage.setItem('sns_profile', JSON.stringify(response.sns_profile));
+            sessionStorage.removeItem('oauth_processing');
+            
             setStatus('success');
             setMessage('새로운 사용자입니다. 프로필 설정으로 이동합니다...');
             setTimeout(() => navigate('/onboarding'), 1500);
@@ -62,6 +80,8 @@ const NaverCallbackPage: React.FC = () => {
             localStorage.setItem('user', JSON.stringify(response.user));
             localStorage.setItem('access_token', response.tokens.access_token);
             localStorage.setItem('refresh_token', response.tokens.refresh_token);
+            
+            sessionStorage.removeItem('oauth_processing');
             
             setStatus('success');
             setMessage('로그인 성공! 홈페이지로 이동합니다...');
@@ -86,12 +106,20 @@ const NaverCallbackPage: React.FC = () => {
         
         setMessage(errorMessage);
         
+        // Clean up processing flag on error
+        sessionStorage.removeItem('oauth_processing');
+        
         // Redirect to login page after error with delay
         setTimeout(() => navigate('/login'), 3000);
       }
     };
 
     handleNaverCallback();
+    
+    // Cleanup function to reset processing flag if component unmounts
+    return () => {
+      sessionStorage.removeItem('oauth_processing');
+    };
   }, [searchParams, navigate, setUser, setTokens]);
 
   const getStatusIcon = () => {
