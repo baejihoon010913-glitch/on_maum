@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import uuid
 
-from app.db.session import Base
+from app.core.database import Base
 
 
 class Post(Base):
@@ -24,4 +24,5 @@ class Post(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    # user = relationship("User", back_populates="posts")
+    author = relationship("User", back_populates="posts")
+    reports = relationship("Report", back_populates="post")

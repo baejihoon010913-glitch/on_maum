@@ -13,15 +13,21 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@tanstack/react-query": "^5.12.2",
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/table-core": "^8.21.3",
     "@types/react-calendar": "^3.9.0",
     "axios": "^1.6.2",
+    "chart.js": "^4.5.1",
     "clsx": "^2.0.0",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-calendar": "^6.0.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",
     "react-router-dom": "^6.20.1",
+
     "tailwind-merge": "^2.2.0",
     "zod": "^3.22.4",
     "zustand": "^4.4.7"
