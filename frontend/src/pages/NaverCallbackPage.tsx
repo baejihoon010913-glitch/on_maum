@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authApi } from '@/api/auth';
 import { useAuthStore } from '@/store';
@@ -10,28 +10,26 @@ const NaverCallbackPage: React.FC = () => {
   const { setUser, setTokens } = useAuthStore();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('네이버 로그인을 처리하고 있습니다...');
+  
+  // Use ref to prevent duplicate execution in React Strict Mode
+  const hasExecuted = useRef(false);
 
   useEffect(() => {
-    // Prevent duplicate execution in React Strict Mode
-    const isProcessed = sessionStorage.getItem('oauth_processing');
-    
     const handleNaverCallback = async () => {
+      // Prevent duplicate execution
+      if (hasExecuted.current) {
+        console.log('NaverCallback already executed, skipping...');
+        return;
+      }
+      
+      hasExecuted.current = true;
       try {
         const code = searchParams.get('code');
         const state = searchParams.get('state');
         const error = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
 
-        console.log('NaverCallback - Processing:', { code: code?.substring(0, 10), state: state?.substring(0, 10), isProcessed });
-
-        // Prevent duplicate processing
-        if (isProcessed) {
-          console.log('OAuth callback already processed, skipping...');
-          return;
-        }
-
-        // Mark as processing
-        sessionStorage.setItem('oauth_processing', 'true');
+        console.log('NaverCallback - Processing:', { code: code?.substring(0, 10), state: state?.substring(0, 10) });
 
         // Check for OAuth errors
         if (error) {
@@ -50,8 +48,8 @@ const NaverCallbackPage: React.FC = () => {
           throw new Error('잘못된 상태 파라미터입니다. 보안상 로그인을 중단합니다.');
         }
 
-        // Clean up state from session storage
-        sessionStorage.removeItem('oauth_state');
+        // Clean up state from session storage only after successful validation
+        // Don't remove it here to prevent issues with React Strict Mode double execution
 
         setMessage('네이버 인증을 확인하고 있습니다...');
 
@@ -62,7 +60,8 @@ const NaverCallbackPage: React.FC = () => {
           // New user - redirect to onboarding with SNS profile data
           if (response.sns_profile) {
             sessionStorage.setItem('sns_profile', JSON.stringify(response.sns_profile));
-            sessionStorage.removeItem('oauth_processing');
+            // Clean up session storage
+            sessionStorage.removeItem('oauth_state');
             
             setStatus('success');
             setMessage('새로운 사용자입니다. 프로필 설정으로 이동합니다...');
@@ -81,7 +80,8 @@ const NaverCallbackPage: React.FC = () => {
             localStorage.setItem('access_token', response.tokens.access_token);
             localStorage.setItem('refresh_token', response.tokens.refresh_token);
             
-            sessionStorage.removeItem('oauth_processing');
+            // Clean up session storage
+            sessionStorage.removeItem('oauth_state');
             
             setStatus('success');
             setMessage('로그인 성공! 홈페이지로 이동합니다...');
@@ -106,8 +106,8 @@ const NaverCallbackPage: React.FC = () => {
         
         setMessage(errorMessage);
         
-        // Clean up processing flag on error
-        sessionStorage.removeItem('oauth_processing');
+        // Clean up session storage on error
+        sessionStorage.removeItem('oauth_state');
         
         // Redirect to login page after error with delay
         setTimeout(() => navigate('/login'), 3000);
@@ -116,9 +116,10 @@ const NaverCallbackPage: React.FC = () => {
 
     handleNaverCallback();
     
-    // Cleanup function to reset processing flag if component unmounts
+    // Cleanup function
     return () => {
-      sessionStorage.removeItem('oauth_processing');
+      // Reset execution flag on unmount
+      hasExecuted.current = false;
     };
   }, [searchParams, navigate, setUser, setTokens]);
 
