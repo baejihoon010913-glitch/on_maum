@@ -7,5 +7,6 @@ export { default as CommaNotesPage } from './CommaNotesPage';
 export { default as ChatPage } from './ChatPage';
 export { default as DiaryPage } from './DiaryPage';
 export { default as CounselorsPage } from './CounselorsPage';
+export { default as CounselorProfilePage } from './CounselorProfilePage';
 export { default as NotificationsPage } from './NotificationsPage';
 export { default as ProfilePage } from './ProfilePage';
