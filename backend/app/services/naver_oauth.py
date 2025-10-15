@@ -22,6 +22,7 @@ class NaverOAuthService:
                         "client_secret": settings.NAVER_CLIENT_SECRET,
                         "code": code,
                         "state": state,
+                        "redirect_uri": settings.NAVER_REDIRECT_URI
                     }
                 )
                 
