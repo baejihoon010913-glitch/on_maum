@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
               </p>
             </div>
           </CardHeader>
-          
+
           <CardContent>
             <div className="space-y-6">
               <div className="text-center">
