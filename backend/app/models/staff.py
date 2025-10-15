@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -28,3 +29,7 @@ class Staff(Base):
     # Relationships
     audit_logs = relationship("AuditLog", back_populates="staff")
     counselor_profile = relationship("CounselorProfile", back_populates="staff", uselist=False)
+    time_slots = relationship("TimeSlot", back_populates="counselor")
+    schedules = relationship("CounselorSchedule", foreign_keys="CounselorSchedule.counselor_id", back_populates="counselor")
+    unavailabilities = relationship("CounselorUnavailability", foreign_keys="CounselorUnavailability.counselor_id", back_populates="counselor")
+    counselor_sessions = relationship("ChatSession", back_populates="counselor")
