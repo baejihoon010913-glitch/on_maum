@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: onmaum_db
+      POSTGRES_USER: onmaum_user
+      POSTGRES_PASSWORD: onmaum_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - onmaum_network
+
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://onmaum_user:onmaum_password@db:5432/onmaum_db
+      SECRET_KEY: your-secret-key-here-change-in-production
+      JWT_SECRET_KEY: your-jwt-secret-key-here-change-in-production
+    depends_on:
+      - db
+    volumes:
+      - ./backend/uploads:/app/uploads
+    networks:
+      - onmaum_network
+
+volumes:
+  postgres_data:
+
+networks:
+  onmaum_network:
+    driver: bridge
