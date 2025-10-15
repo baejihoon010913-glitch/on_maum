@@ -21,4 +21,4 @@ class Message(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    # session = relationship("ChatSession", back_populates="messages")
+    session = relationship("ChatSession", back_populates="messages")
