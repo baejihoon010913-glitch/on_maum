@@ -79,6 +79,84 @@ export interface DiaryCreate {
   mood?: string;
 }
 
+export interface DiaryUpdate {
+  title?: string;
+  content?: string;
+  mood?: string;
+}
+
+export interface DiaryStatistics {
+  year: number;
+  month: number;
+  total_entries: number;
+  mood_distribution: Record<string, number>;
+  most_active_day: string | null;
+  writing_streak: number;
+  average_length: number;
+}
+
+// Post additional types
+export interface PostUpdate {
+  title?: string;
+  content?: string;
+  category?: string;
+  is_private?: boolean;
+}
+
+export interface PostEmpathyResponse {
+  empathized: boolean;
+  empathy_count: number;
+  message: string;
+}
+
+export interface PostSearchResponse extends PaginatedResponse<Post> {
+  query: string;
+  search_time: number;
+  sort_by?: string;
+}
+
+export interface CounselorReply {
+  id: string;
+  post_id: string;
+  staff_id: string;
+  counselor_name: string;
+  content: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+// Mood options for diary
+export const DIARY_MOODS = [
+  'happy',
+  'calm',
+  'excited',
+  'sad',
+  'anxious', 
+  'angry',
+  'frustrated',
+  'peaceful',
+  'grateful',
+  'lonely'
+] as const;
+
+export type DiaryMood = typeof DIARY_MOODS[number];
+
+// Post categories
+export const POST_CATEGORIES = [
+  'general',
+  'relationships',
+  'academic',
+  'family',
+  'friendship',
+  'career',
+  'health',
+  'emotions',
+  'daily'
+] as const;
+
+export type PostCategory = typeof POST_CATEGORIES[number];
+
 // Chat Session types
 export interface ChatSession {
   id: string;

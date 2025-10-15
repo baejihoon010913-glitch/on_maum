@@ -29,7 +29,7 @@ export const postsApi = {
   },
 
   // Get user's posts
-  getMyPosts: async (params: Omit<PostsQuery, 'category'> = {}): Promise<Post[]> => {
+  getMyPosts: async (params: Omit<PostsQuery, 'category'> = {}): Promise<PaginatedResponse<Post>> => {
     const response = await apiClient.get('/posts/my', { params });
     return response.data;
   },
@@ -55,6 +55,7 @@ export const postsApi = {
   // Toggle empathy
   toggleEmpathy: async (postId: string): Promise<{
     empathized: boolean;
+    empathy_count: number;
     message: string;
   }> => {
     const response = await apiClient.post(`/posts/${postId}/empathy`);
