@@ -38,6 +38,7 @@ async def naver_login(
     """
     Naver OAuth login
     """
+    print(f"Received Naver login request: code={request_data.code}, state={request_data.state}")
     # Verify with Naver OAuth
     sns_profile_data = await NaverOAuthService.verify_user(
         request_data.code, 

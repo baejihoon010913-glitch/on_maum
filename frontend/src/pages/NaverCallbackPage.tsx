@@ -54,7 +54,9 @@ const NaverCallbackPage: React.FC = () => {
         setMessage('네이버 인증을 확인하고 있습니다...');
 
         // Send code and state to backend for verification
+        console.log('Sending request to backend with:', { code, state });
         const response = await authApi.naverLogin({ code, state });
+        console.log('Backend response:', response);
 
         if (response.is_new_user) {
           // New user - redirect to onboarding with SNS profile data

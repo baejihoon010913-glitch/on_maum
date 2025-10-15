@@ -8,7 +8,7 @@ const LoginPage: React.FC = () => {
     sessionStorage.setItem('oauth_state', state);
 
     // Naver OAuth configuration
-    const naverClientId = import.meta.env.VITE_NAVER_CLIENT_ID || 'gfBE_MSzJtw5lL5jLOP8';
+    const naverClientId = import.meta.env.VITE_NAVER_CLIENT_ID || '8TzOPBFXBzGT8hsrwA10';
     const redirectUri = encodeURIComponent(window.location.origin + '/auth/naver/callback');
     const responseType = 'code';
 

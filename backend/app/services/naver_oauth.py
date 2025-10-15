@@ -13,6 +13,10 @@ class NaverOAuthService:
     async def get_access_token(cls, code: str, state: str) -> Optional[str]:
         """Get access token from Naver OAuth"""
         try:
+            print(f"Getting Naver access token with code: {code}, state: {state}")
+            print(f"Using client_id: {settings.NAVER_CLIENT_ID}")
+            print(f"Using redirect_uri: {settings.NAVER_REDIRECT_URI}")
+            
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     cls.NAVER_TOKEN_URL,
@@ -26,9 +30,14 @@ class NaverOAuthService:
                     }
                 )
                 
+                print(f"Naver token response status: {response.status_code}")
+                print(f"Naver token response: {response.text}")
+                
                 if response.status_code == 200:
                     token_data = response.json()
                     return token_data.get("access_token")
+                else:
+                    print(f"Failed to get access token. Status: {response.status_code}, Response: {response.text}")
                     
         except Exception as e:
             print(f"Error getting Naver access token: {e}")
